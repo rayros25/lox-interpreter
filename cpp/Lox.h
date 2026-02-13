@@ -3,11 +3,10 @@
 
 using namespace std;
 
-// private static void runFile(String path) throws IOException {
 void runFile(string path);
-// private static void runPrompt() throws IOException {
 void runPrompt();
-
 void run(string source);
+void error(int line, string message);
+void report(int line, string where, string message);
 
 #endif

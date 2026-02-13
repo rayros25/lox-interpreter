@@ -3,17 +3,22 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <list>
 
 #include "Lox.h"
+#include "Token.h"
+#include "Scanner.h"
 
-// using namespace std;
+using namespace std;
+
+bool hadError = false; // Yes, it's a global variable, sue me.
 
 int main(int argc, char* argv[]) {
     if (argc > 2) {
         cout << "Usage: jlox [script]" << endl;
         exit(EX_USAGE);
     } else if (argc == 2) {
-        runFile(argv[0]);
+        runFile(argv[1]);
     } else {
         runPrompt();
     }
@@ -21,45 +26,48 @@ int main(int argc, char* argv[]) {
     return 0; // TODO: change this to something nice
 }
 
-  // private static void runFile(String path) throws IOException {
-  //   byte[] bytes = Files.readAllBytes(Paths.get(path));
-  //   run(new String(bytes, Charset.defaultCharset()));
-  // }
 void runFile(string path) {
-    cout << "RUNNING:" << path << endl;
     ifstream infile(path);
-    // ifstream infile;
-    // infile.open(path);
-    // if (not infile.is_open()) {
-    //     cerr << "Error: Could not open file" << endl;
-    //     exit(EX_NOINPUT);
-    // }
     stringstream bufstream;
     bufstream << infile.rdbuf();
     run(bufstream.str());
+
+    if (hadError) exit(EX_DATAERR);
 }
 
-  // private static void runPrompt() throws IOException {
-  //   InputStreamReader input = new InputStreamReader(System.in);
-  //   BufferedReader reader = new BufferedReader(input);
-  //
-  //   for (;;) { 
-  //     System.out.print("> ");
-  //     String line = reader.readLine();
-  //     if (line == null) break;
-  //     run(line);
-  //   }
-  // }
 void runPrompt() {
     for (;;) {
         cout << "> ";
         string line;
         cin >> line;
-// TODO: if EOF, then break
+        if (cin.eof()) break;
         run(line);
+        hadError = false;
     }
 }
 
+    // Scanner scanner = new Scanner(source);
+    // List<Token> tokens = scanner.scanTokens();
+    //
+    // // For now, just print the tokens.
+    // for (Token token : tokens) {
+    //   System.out.println(token);
+    // }
 void run(string source) {
-    (void)source;
+    Scanner scanner(source);
+    list<Token> tokens = scanner.scanTokens();
+
+    for (Token token : tokens) {
+        cout << token.toString() << endl;
+    }
+}
+
+
+void error(int line, string message) {
+    report(line, "", message);
+}
+
+void report(int line, string where, string message) {
+    cerr << "[line " << line << "] Error" << where << ": " << message << endl;
+    hadError = true;
 }
