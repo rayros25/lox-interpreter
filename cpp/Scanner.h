@@ -2,6 +2,7 @@
 #define __SCANNER_H__
 
 #include <list>
+#include <unordered_map>
 #include "Token.h"
 
 // using namespace std;
@@ -9,13 +10,14 @@
 class Scanner {
 public:
     Scanner(std::string source);
-    list<Token> scanTokens();
+    std::list<Token> scanTokens();
 private:
     std::string source;
-    list<Token> tokens;
+    std::list<Token> tokens;
     int start = 0;
     int current = 0;
     int line = 1;
+    std::unordered_map<std::string, TokenType> keywords;
 
     void scanToken();
     void identifier();

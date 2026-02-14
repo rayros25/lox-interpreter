@@ -4,15 +4,30 @@ CXX      = clang++
 CXXFLAGS = -Wall -Wextra -Wreturn-type -g
 LDFLAGS  = -g
 
+#include <stdlib.h>
+#include <sysexits.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <list>
 
-jlox: Lox.o Token.o Scanner.o
+#include "Lox.h"
+#include "Token.h"
+#include "Scanner.h"
+
+
+jlox: main.o Lox.o Token.o Scanner.o Object.o
 	${CXX} ${LDFLAGS} -o $@ $^
+
+main.o: main.cpp Lox.o Lox.h
 
 Lox.o: Lox.cpp Lox.h
 
 Token.o: Token.cpp Token.h TokenType.h
 
-Scanner.o: Scanner.cpp Scanner.h
+Scanner.o: Scanner.cpp Scanner.h Lox.h Token.h TokenType.h Object.h
+
+Object.o: Object.cpp Object.h
 
 clean:
 	rm -f jlox *.o

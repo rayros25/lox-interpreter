@@ -1,7 +1,9 @@
 #ifndef __TOKEN_H__
 #define __TOKEN_H__
 
+#include <string>
 #include "TokenType.h"
+#include "Object.h"
 
 class Token {
 public:

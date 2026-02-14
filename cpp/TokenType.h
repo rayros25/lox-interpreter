@@ -1,4 +1,6 @@
-// TODO: guardrails
+#ifndef __TOKENTYPE_H__
+#define __TOKENTYPE_H__
+
 enum TokenType {
   // Single-character tokens.
   LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
@@ -20,3 +22,4 @@ enum TokenType {
   // EOF is reserved in C++. So we got "End-OF" instead.
   ENDOF
 };
+#endif

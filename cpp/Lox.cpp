@@ -11,9 +11,11 @@
 
 using namespace std;
 
-bool hadError = false; // Yes, it's a global variable, sue me.
+// bool hadError = false; // Yes, it's a global variable, sue me.
 
-int main(int argc, char* argv[]) {
+bool Lox::hadError = false;
+
+int Lox::main(int argc, char* argv[]) {
     if (argc > 2) {
         cout << "Usage: jlox [script]" << endl;
         exit(EX_USAGE);
@@ -26,7 +28,7 @@ int main(int argc, char* argv[]) {
     return 0; // TODO: change this to something nice
 }
 
-void runFile(string path) {
+void Lox::runFile(string path) {
     ifstream infile(path);
     stringstream bufstream;
     bufstream << infile.rdbuf();
@@ -35,7 +37,7 @@ void runFile(string path) {
     if (hadError) exit(EX_DATAERR);
 }
 
-void runPrompt() {
+void Lox::runPrompt() {
     for (;;) {
         cout << "> ";
         string line;
@@ -46,14 +48,7 @@ void runPrompt() {
     }
 }
 
-    // Scanner scanner = new Scanner(source);
-    // List<Token> tokens = scanner.scanTokens();
-    //
-    // // For now, just print the tokens.
-    // for (Token token : tokens) {
-    //   System.out.println(token);
-    // }
-void run(string source) {
+void Lox::run(string source) {
     Scanner scanner(source);
     list<Token> tokens = scanner.scanTokens();
 
@@ -62,12 +57,11 @@ void run(string source) {
     }
 }
 
-
-void error(int line, string message) {
+void Lox::error(int line, string message) {
     report(line, "", message);
 }
 
-void report(int line, string where, string message) {
+void Lox::report(int line, string where, string message) {
     cerr << "[line " << line << "] Error" << where << ": " << message << endl;
     hadError = true;
 }

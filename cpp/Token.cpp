@@ -1,14 +1,15 @@
+#include <stdlib.h>
 #include "Token.h"
+#include "Object.h"
 
-using namepsace std;
-
-Token::Token(TokenType type, string lexeme, Object literal, int line) {
-    this.type = type;
-    this.lexeme = lexeme;
-    this.literal = literal;
-    this.line = line;
+Token::Token(TokenType type, std::string lexeme, Object literal, int line) {
+    this->type = type;
+    this->lexeme = lexeme;
+    this->literal = literal;
+    this->line = line;
 }
 
-string Token::toString() {
-    return type + " " + lexeme + " " + literal;
+std::string Token::toString() {
+    // return type + " " + lexeme + " " + literal;
+    return "TODO: TokenType to string" + lexeme + " " + literal.toString();
 }
