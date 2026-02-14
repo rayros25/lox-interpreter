@@ -5,31 +5,36 @@
 #include "TokenType.h"
 #include "Object.h"
 
+#include <iostream>
+
 // Bruh.
 // static const std::unordered_map<std::string, TokenType> keywords;
 // static const std::unordered_map<std::string, TokenType> keywords = {
-// std::unordered_map<std::string, TokenType> keywords = {
-//     { "and",    AND },
-//     { "class",  CLASS },
-//     { "else",   ELSE },
-//     { "false",  FALSE },
-//     { "for",    FOR },
-//     { "fun",    FUN },
-//     { "if",     IF },
-//     { "nil",    NIL },
-//     { "or",     OR },
-//     { "print",  PRINT },
-//     { "return", RETURN },
-//     { "super",  SUPER },
-//     { "this",   THIS },
-//     { "true",   TRUE },
-//     { "var",    VAR },
-//     { "while",  WHILE }
-// };
+//
+// std::unordered_map<std::string, TokenType> keywords {
 
 Scanner::Scanner(std::string source) {
     this->source = source;
+    this->keywords = {
+        { "and",    AND },
+        { "class",  CLASS },
+        { "else",   ELSE },
+        { "false",  FALSE },
+        { "for",    FOR },
+        { "fun",    FUN },
+        { "if",     IF },
+        { "nil",    NIL },
+        { "or",     OR },
+        { "print",  PRINT },
+        { "return", RETURN },
+        { "super",  SUPER },
+        { "this",   THIS },
+        { "true",   TRUE },
+        { "var",    VAR },
+        { "while",  WHILE }
+    };
     // I think tokens is already initialized
+    //
 }
 
 std::list<Token> Scanner::scanTokens() {
@@ -102,12 +107,31 @@ void Scanner::identifier() {
 
     std::string text = source.substr(start, current);
     TokenType type;
-    // try {
-    //     type = keywords.at(text);
-    // } catch (std::out_of_range e) {
+    try {
+        // std::cerr << keywords << std::endl;
+        // if (text == "and") { std::cerr << "AND!!!" << std::endl; }
+
+        // type = keywords["and"];
+        // std::cerr << "Using []: type = " << Token::typeToString(type) << std::endl;
+        type = keywords.at(text);
+        // std::cerr << "Using .at(): type = " << Token::typeToString(type) << std::endl;
+    } catch (std::out_of_range e) {
+        // std::cerr << "caught the try" << std::endl;
+        type = IDENTIFIER;
+    }
+
+    // for (const auto& [key, value] : this->keywords) {
+    //     std::cerr << "Key:[" << key << "] Value:[" << value << "]\n";
+    // }
+    //
+    // std::cerr << "Size:[" << this->keywords.size() << "]\n";
+    //
+    // if (keywords.contains(text)) {
+    //     type = keywords[text];
+    // } else {
     //     type = IDENTIFIER;
     // }
-    type = IDENTIFIER;
+
     addToken(type);
 }
 
@@ -122,8 +146,7 @@ void Scanner::number() {
         while (isDigit(peek())) { advance(); }
     }
 
-    addToken(NUMBER, Object(413));
-    // addToken(NUMBER, std::stod(source.substr(start, current)));
+    addToken(NUMBER, std::stod(source.substr(start, current)));
 }
 
 void Scanner::string() {
