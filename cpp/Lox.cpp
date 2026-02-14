@@ -39,7 +39,7 @@ void Lox::runPrompt() {
     for (;;) {
         cout << "> ";
         string line;
-        cin >> line;
+        getline(cin, line);
         if (cin.eof()) break;
         run(line);
         hadError = false;

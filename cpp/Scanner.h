@@ -5,8 +5,6 @@
 #include <unordered_map>
 #include "Token.h"
 
-// using namespace std;
-
 class Scanner {
 public:
     Scanner(std::string source);

@@ -9,7 +9,6 @@ Token::Token(TokenType type, std::string lexeme, Object literal, int line) {
     this->line = line;
 }
 
-// TODO: This works, right?
 std::string Token::typeToString(TokenType type) {
     std::string typearr[39] = { "LEFT_PAREN", "RIGHT_PAREN", "LEFT_BRACE", "RIGHT_BRACE",
          "COMMA", "DOT", "MINUS", "PLUS", "SEMICOLON", "SLASH", "STAR", "BANG",
@@ -21,7 +20,6 @@ std::string Token::typeToString(TokenType type) {
 }
 
 std::string Token::toString() {
-    // return type + " " + lexeme + " " + literal;
     return typeToString(type) + " " + lexeme + " " + literal.toString();
 }
 

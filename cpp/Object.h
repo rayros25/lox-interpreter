@@ -3,6 +3,8 @@
 
 #include <string>
 
+// The whole point of this class is to dance around the polymorphism used in
+// the book.
 class Object {
 
 public:

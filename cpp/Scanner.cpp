@@ -7,12 +7,6 @@
 
 #include <iostream>
 
-// Bruh.
-// static const std::unordered_map<std::string, TokenType> keywords;
-// static const std::unordered_map<std::string, TokenType> keywords = {
-//
-// std::unordered_map<std::string, TokenType> keywords {
-
 Scanner::Scanner(std::string source) {
     this->source = source;
     this->keywords = {
@@ -34,7 +28,6 @@ Scanner::Scanner(std::string source) {
         { "while",  WHILE }
     };
     // I think tokens is already initialized
-    //
 }
 
 std::list<Token> Scanner::scanTokens() {
@@ -81,9 +74,9 @@ void Scanner::scanToken() {
               addToken(SLASH);
           }
           break;
-        case ' ':
-        case '\r':
-        case '\t':
+        case ' ': break;
+        case '\r': break;
+        case '\t': 
           // Ignore whitespace.
           break;
         case '\n':
@@ -105,32 +98,13 @@ void Scanner::scanToken() {
 void Scanner::identifier() {
     while (isAlphaNumeric(peek())) { advance(); }
 
-    std::string text = source.substr(start, current);
+    std::string text = source.substr(start, current - start);
     TokenType type;
     try {
-        // std::cerr << keywords << std::endl;
-        // if (text == "and") { std::cerr << "AND!!!" << std::endl; }
-
-        // type = keywords["and"];
-        // std::cerr << "Using []: type = " << Token::typeToString(type) << std::endl;
         type = keywords.at(text);
-        // std::cerr << "Using .at(): type = " << Token::typeToString(type) << std::endl;
     } catch (std::out_of_range e) {
-        // std::cerr << "caught the try" << std::endl;
         type = IDENTIFIER;
     }
-
-    // for (const auto& [key, value] : this->keywords) {
-    //     std::cerr << "Key:[" << key << "] Value:[" << value << "]\n";
-    // }
-    //
-    // std::cerr << "Size:[" << this->keywords.size() << "]\n";
-    //
-    // if (keywords.contains(text)) {
-    //     type = keywords[text];
-    // } else {
-    //     type = IDENTIFIER;
-    // }
 
     addToken(type);
 }
@@ -146,12 +120,12 @@ void Scanner::number() {
         while (isDigit(peek())) { advance(); }
     }
 
-    addToken(NUMBER, std::stod(source.substr(start, current)));
+    addToken(NUMBER, std::stod(source.substr(start, current - start)));
 }
 
 void Scanner::string() {
     while (peek() != '"' and not isAtEnd()) {
-        if (peek() == '\n') line++;
+        if (peek() == '\n') { line++; }
         advance();
     }
 
@@ -164,7 +138,7 @@ void Scanner::string() {
     advance();
 
     // Trim the surrounding quotes.
-    std::string value = source.substr(start + 1, current - 1);
+    std::string value = source.substr(start + 1, current - start - 2);
     addToken(STRING, Object(value));
 }
 
@@ -213,6 +187,6 @@ void Scanner::addToken(TokenType type) {
 }
 
 void Scanner::addToken(TokenType type, Object literal) {
-    std::string text = source.substr(start, current);
+    std::string text = source.substr(start, current - start);
     tokens.push_back(Token(type, text, literal, line));
 }
