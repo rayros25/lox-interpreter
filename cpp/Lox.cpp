@@ -11,8 +11,6 @@
 
 using namespace std;
 
-// bool hadError = false; // Yes, it's a global variable, sue me.
-
 bool Lox::hadError = false;
 
 int Lox::main(int argc, char* argv[]) {
@@ -25,7 +23,7 @@ int Lox::main(int argc, char* argv[]) {
         runPrompt();
     }
 
-    return 0; // TODO: change this to something nice
+    return EXIT_SUCCESS;
 }
 
 void Lox::runFile(string path) {

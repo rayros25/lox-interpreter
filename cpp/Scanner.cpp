@@ -122,7 +122,8 @@ void Scanner::number() {
         while (isDigit(peek())) { advance(); }
     }
 
-    addToken(NUMBER, std::stod(source.substr(start, current)));
+    addToken(NUMBER, Object(413));
+    // addToken(NUMBER, std::stod(source.substr(start, current)));
 }
 
 void Scanner::string() {
@@ -141,7 +142,7 @@ void Scanner::string() {
 
     // Trim the surrounding quotes.
     std::string value = source.substr(start + 1, current - 1);
-    addToken(STRING, value);
+    addToken(STRING, Object(value));
 }
 
 bool Scanner::match(char expected) {

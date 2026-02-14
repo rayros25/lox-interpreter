@@ -21,9 +21,9 @@ jlox: main.o Lox.o Token.o Scanner.o Object.o
 
 main.o: main.cpp Lox.o Lox.h
 
-Lox.o: Lox.cpp Lox.h
+Lox.o: Lox.cpp Lox.h Token.h Scanner.h
 
-Token.o: Token.cpp Token.h TokenType.h
+Token.o: Token.cpp Token.h TokenType.h Object.h
 
 Scanner.o: Scanner.cpp Scanner.h Lox.h Token.h TokenType.h Object.h
 
