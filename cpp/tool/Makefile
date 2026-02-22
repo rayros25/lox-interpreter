@@ -16,18 +16,10 @@ LDFLAGS  = -g
 #include "Scanner.h"
 
 
-jlox: main.o Lox.o Token.o Scanner.o Object.o
+generate_ast: GenerateAst.o
 	${CXX} ${LDFLAGS} -o $@ $^
 
-main.o: main.cpp Lox.o Lox.h
-
-Lox.o: Lox.cpp Lox.h Token.h Scanner.h
-
-Token.o: Token.cpp Token.h TokenType.h Object.h
-
-Scanner.o: Scanner.cpp Scanner.h Lox.h Token.h TokenType.h Object.h
-
-Object.o: Object.cpp Object.h
+GenerateAst.o: GenerateAst.cpp
 
 clean:
-	rm -f jlox *.o
+	rm -f generate_ast *.o
