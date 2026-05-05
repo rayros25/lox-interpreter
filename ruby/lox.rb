@@ -1,7 +1,10 @@
 require "./scanner"
 
 class Lox
-  # TODO: in initialize: hadError = false?
+  def initialize
+    @@hadError = false
+  end
+
   ### PUBLIC ###
   def Lox.main( args )
     if args.length > 1
@@ -21,6 +24,7 @@ class Lox
 
   ### PRIVATE ###
   def Lox.runFile( path )
+    # TODO:
     # run(stuff in file)
   end
 
@@ -29,6 +33,7 @@ class Lox
       print "> "
       line = gets
       break unless line
+      line.chomp! # Get rid of the \n at the end
       run(line)
     end
   end
@@ -36,13 +41,7 @@ class Lox
   def Lox.run( source )
     scanner = Scanner.new(source)
     tokens = scanner.scanTokens
-    # Scanner scanner = new Scanner(source);
-    # tokesn = scanner.scanTokens()
-    #
-    # for token in tokens
-    #   print token
     tokens.each {|token| puts token}
-    # print "LINE: ", source
   end
 
   def Lox.report( line, where, message )

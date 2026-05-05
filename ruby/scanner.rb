@@ -92,7 +92,6 @@ class Scanner
     when '"'
       string
     else
-      puts "c: ", c
       if isDigit(c)
         number
       elsif isAlpha(c)
@@ -104,8 +103,9 @@ class Scanner
   end
 
   def advance
+    curr = @source[@current]
     @current += 1
-    return @source[@current]
+    return curr
   end
 
   def addToken( *args )
