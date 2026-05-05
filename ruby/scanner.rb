@@ -120,7 +120,7 @@ class Scanner
       #   text = @source[@start, @current]
       #   @tokens << Token.new(type, text, literal, @line)
       # end
-      text = @source[@start..@current]
+      text = @source[@start..@current - 1]
       @tokens << Token.new(args[0], text, args[1], @line)
     end
   end
@@ -169,7 +169,7 @@ class Scanner
     advance
 
     # Trim the surrounding quotes.
-    value = @source[@start + 1..@current - 1]
+    value = @source[@start + 1..@current - 2]
     addToken(:string, value)
   end
 
@@ -189,7 +189,7 @@ class Scanner
     while isAlphaNumeric peek
       advance
     end
-    text = @source[@start..@current]
+    text = @source[@start..@current - 1]
     type = @keywords[text]
     unless type
       type = :identifier
@@ -211,7 +211,7 @@ class Scanner
       end
     end
 
-    addToken(:number, @source[@start..@current].to_f)
+    addToken(:number, @source[@start..@current - 1].to_f)
   end
 
 end
