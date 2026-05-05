@@ -10,22 +10,22 @@ class Scanner
     @line = 1
 
     @keywords = { 
-      "and" => :and,
-      "class" => :class,
-      "else" => :else,
-      "false" => :false,
-      "for" => :for,
-      "fun" => :fun,
-      "if" => :if,
-      "nil" => :nil,
-      "or" => :or,
-      "print" => :print,
-      "return" => :return,
-      "super" => :super,
-      "this" => :this,
-      "true" => :true,
-      "var" => :var,
-      "while" => :while
+      'and' => :and,
+      'class' => :class,
+      'else' => :else,
+      'false' => :false,
+      'for' => :for,
+      'fun' => :fun,
+      'if' => :if,
+      'nil' => :nil,
+      'or' => :or,
+      'print' => :print,
+      'return' => :return,
+      'super' => :super,
+      'this' => :this,
+      'true' => :true,
+      'var' => :var,
+      'while' => :while
     }
   end
 
@@ -78,20 +78,21 @@ class Scanner
     when '/'
       if match('/')
         # A comment goes until the end of the line.
-        while peek != '\n' && !isAtEnd
+        while peek != "\n" && !isAtEnd
           advance
         end
       else
         addToken(:slash)
       end
-    when ' '
-    when '\r'
-    when '\t'
-    when '\n'
+    when " "
+    when "\r"
+    when "\t"
+    when "\n"
       @line += 1
     when '"'
       string
     else
+      puts "c: ", c
       if isDigit(c)
         number
       elsif isAlpha(c)
@@ -119,10 +120,8 @@ class Scanner
       #   text = @source[@start, @current]
       #   @tokens << Token.new(type, text, literal, @line)
       # end
-      text = @source[@start, @current]
+      text = @source[@start..@current]
       @tokens << Token.new(args[0], text, args[1], @line)
-    else
-      puts "something REALLY went wrong sorry"
     end
   end
 
@@ -141,22 +140,21 @@ class Scanner
 
   def peek
     if isAtEnd
-      # TODO: is this the null character?
-      return '\0'
+      return nil
     end
       return @source[@current]
   end
 
   def peekNext
     if @current + 1 >= @source.length
-      return '\0'
+      return nil
     end
     return @source[@current + 1]
   end
 
   def string
     while peek != '"' && !isAtEnd
-      if peek == '\n'
+      if peek == "\n"
         @line += 1
       end
       advance
@@ -171,7 +169,7 @@ class Scanner
     advance
 
     # Trim the surrounding quotes.
-    value = @source[@start + 1, @current - 1]
+    value = @source[@start + 1..@current - 1]
     addToken(:string, value)
   end
 
@@ -191,7 +189,7 @@ class Scanner
     while isAlphaNumeric peek
       advance
     end
-    text = @source[@start, @current]
+    text = @source[@start..@current]
     type = @keywords[text]
     unless type
       type = :identifier
@@ -213,7 +211,7 @@ class Scanner
       end
     end
 
-    addToken(:number, @source[@start, @current].to_f)
+    addToken(:number, @source[@start..@current].to_f)
   end
 
 end
