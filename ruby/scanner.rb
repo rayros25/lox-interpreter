@@ -52,7 +52,7 @@ class Scanner
     when ')'
       addToken(:right_paren)
     when '{' 
-      addToken(:right_brace)
+      addToken(:left_brace)
     when '}' 
       addToken(:right_brace)
     when ',' 
@@ -68,13 +68,13 @@ class Scanner
     when ';' 
       addToken(:semicolon)
     when '!'
-      addToken(:bang_equal ? match('=') : :bang)
+      addToken(match('=') ? :bang_equal : :bang)
     when '='
-      addToken(:equal_equal ? match('=') : :equal)
+      addToken(match('=') ? :equal_equal : :equal)
     when '>'
-      addToken(:greater_equal ? match('=') : :greater)
+      addToken(match('=') ? :greater_equal : :greater)
     when '<'
-      addToken(:less_equal ? match('=') : :less)
+      addToken(match('=') ? :less_equal : :less)
     when '/'
       if match('/')
         # A comment goes until the end of the line.
@@ -190,6 +190,7 @@ class Scanner
       advance
     end
     text = @source[@start..@current - 1]
+    print "iden -- ", text
     type = @keywords[text]
     unless type
       type = :identifier
