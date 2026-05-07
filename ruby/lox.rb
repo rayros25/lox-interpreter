@@ -28,7 +28,7 @@ class Lox
   end
 
   def Lox.runPrompt
-    while true
+    loop do
       print "> "
       line = gets
       break unless line
