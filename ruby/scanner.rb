@@ -35,7 +35,7 @@ class Scanner
       scanToken
     end
 
-    @tokens << Token::new(:eof, "", nil, @line)
+    @tokens << Token::new( :eof, "", nil, @line )
     return @tokens
   end
 
@@ -48,41 +48,41 @@ class Scanner
     # switch statement
     case c
     when '('
-      addToken(:left_paren)
+      addToken( :left_paren )
     when ')'
-      addToken(:right_paren)
+      addToken( :right_paren )
     when '{' 
-      addToken(:left_brace)
+      addToken( :left_brace )
     when '}' 
-      addToken(:right_brace)
+      addToken( :right_brace )
     when ',' 
-      addToken(:comma)
+      addToken( :comma )
     when '.' 
-      addToken(:dot)
+      addToken( :dot )
     when '+' 
-      addToken(:plus)
+      addToken( :plus )
     when '-' 
-      addToken(:minus)
+      addToken( :minus )
     when '*' 
-      addToken(:star)
+      addToken( :star )
     when ';' 
-      addToken(:semicolon)
+      addToken( :semicolon )
     when '!'
-      addToken(match('=') ? :bang_equal : :bang)
+      addToken( match( '=' ) ? :bang_equal : :bang)
     when '='
-      addToken(match('=') ? :equal_equal : :equal)
+      addToken( match( '=' ) ? :equal_equal : :equal)
     when '>'
-      addToken(match('=') ? :greater_equal : :greater)
+      addToken( match( '=' ) ? :greater_equal : :greater)
     when '<'
-      addToken(match('=') ? :less_equal : :less)
+      addToken( match( '=' ) ? :less_equal : :less)
     when '/'
-      if match('/')
+      if match( '/' )
         # A comment goes until the end of the line.
         while peek != "\n" && !isAtEnd
           advance
         end
       else
-        addToken(:slash)
+        addToken( :slash )
       end
     when " "
     when "\r"
@@ -92,12 +92,12 @@ class Scanner
     when '"'
       string
     else
-      if isDigit(c)
+      if isDigit( c )
         number
-      elsif isAlpha(c)
+      elsif isAlpha( c )
         identifier
       else
-        Lox::error(@line, "Unexpected character.")
+        Lox::error( @line, "Unexpected character." )
       end
     end
   end
@@ -109,59 +109,49 @@ class Scanner
   end
 
   def addToken( *args )
+    # We have to do this cuz ruby doesn't have overloading
     case args.size
     when 1
       # def addToken( type )
-      #   addToken(type, nil)
+      #   addToken( type, nil )
       # end
-      addToken(args[0], nil)
+      addToken( args[0], nil )
     when 2
       # def addToken( type, literal )
-      #   text = @source[@start, @current]
-      #   @tokens << Token.new(type, text, literal, @line)
+      #   text = @source[@start...@current]
+      #   @tokens << Token::new( type, text, literal, @line )
       # end
-      text = @source[@start..@current - 1]
-      @tokens << Token.new(args[0], text, args[1], @line)
+      text = @source[@start...@current]
+      @tokens << Token::new( args[0], text, args[1], @line )
     end
   end
 
   def match( expected )
-    if isAtEnd
-      return false
-    end
-
-    if @source[@current] != expected
-      return false
-    end
+    return false if isAtEnd
+    return false if @source[@current] != expected
 
     @current += 1
     return true
   end
 
   def peek
-    if isAtEnd
-      return nil
-    end
-      return @source[@current]
+    return nil if isAtEnd
+    return @source[@current]
   end
 
   def peekNext
-    if @current + 1 >= @source.length
-      return nil
-    end
+    return nil if @current + 1 >= @source.length
     return @source[@current + 1]
   end
 
   def string
     while peek != '"' && !isAtEnd
-      if peek == "\n"
-        @line += 1
-      end
+      @line += 1 if peek == "\n"
       advance
     end
     
     if isAtEnd
-      Lox::error(@line, "Unterminated string.")
+      Lox::error( @line, "Unterminated string." )
       return
     end
 
@@ -169,8 +159,8 @@ class Scanner
     advance
 
     # Trim the surrounding quotes.
-    value = @source[@start + 1..@current - 2]
-    addToken(:string, value)
+    value = @source[@start + 1...@current - 1]
+    addToken( :string, value )
   end
 
   def isDigit( c )
@@ -182,20 +172,16 @@ class Scanner
   end
 
   def isAlphaNumeric( c )
-    return isDigit(c) || isAlpha(c)
+    return isDigit( c ) || isAlpha( c )
   end
 
   def identifier
     while isAlphaNumeric peek
       advance
     end
-    text = @source[@start..@current - 1]
-    print "iden -- ", text
-    type = @keywords[text]
-    unless type
-      type = :identifier
-    end
-    addToken(type)
+    text = @source[@start...@current]
+    type = @keywords[text] || :identifier
+    addToken( type )
   end
 
   def number
@@ -212,7 +198,7 @@ class Scanner
       end
     end
 
-    addToken(:number, @source[@start..@current - 1].to_f)
+    addToken( :number, @source[@start...@current].to_f )
   end
 
 end

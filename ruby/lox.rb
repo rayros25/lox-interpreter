@@ -24,8 +24,7 @@ class Lox
 
   ### PRIVATE ###
   def Lox.runFile( path )
-    # TODO:
-    # run(stuff in file)
+    run File::read( path )
   end
 
   def Lox.runPrompt
@@ -34,14 +33,15 @@ class Lox
       line = gets
       break unless line
       line.chomp! # Get rid of the \n at the end
-      run(line)
+      run( line )
     end
   end
 
   def Lox.run( source )
-    scanner = Scanner.new(source)
+    p source
+    scanner = Scanner::new( source )
     tokens = scanner.scanTokens
-    tokens.each {|token| puts token}
+    tokens.each { |token| puts token }
   end
 
   def Lox.report( line, where, message )
