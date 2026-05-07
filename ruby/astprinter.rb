@@ -43,11 +43,12 @@ end
 # expression = Binary::new( [:a, :b, :c] ) # Is this baD?
 # expression = Binary::new([  Literal::new([6]), Token::new( :minus, "-", nil, 1 ), Literal::new([7]) ])
 
-expression = Binary::new([
-  Unary::new([ Token::new( :minus, "-", nil, 1 ),
-              Literal::new([ 123 ]) ]),
-  Token::new( :star, "*", nil, 1 ),
-  Grouping::new([ Literal::new([ 45.67 ]) ])
-])
-
-puts AstPrinter::new.print(expression)
+## TESTING
+# expression = Binary::new([
+#   Unary::new([ Token::new( :minus, "-", nil, 1 ),
+#               Literal::new([ 123 ]) ]),
+#   Token::new( :star, "*", nil, 1 ),
+#   Grouping::new([ Literal::new([ 45.67 ]) ])
+# ])
+#
+# puts AstPrinter::new.print(expression)
