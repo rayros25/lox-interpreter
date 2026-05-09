@@ -1,9 +1,13 @@
 require "./scanner"
 require "./parser"
 require "./astprinter"
+require "./loxruntimeerror"
+require "./interpreter"
 
 class Lox
+  @@interpreter = Interpreter::new
   @@hadError = false
+  @@hadRuntimeError = false
   # def initialize
   # end
 
@@ -29,13 +33,22 @@ class Lox
     if token.type == :eof
       report( token.line, " at end", message)
     else
-      report( token.line, " at '" + token.lexeme + "'", message)
+      report( token.line, " at '#{token.lexeme}'", message)
     end
+  end
+
+  def Lox.runtimeError( error )
+    STDERR.puts ( error.getMessage + "\n[line #{error.token.line}]" )
+    @@hadRuntimeError = true
   end
 
   ### PRIVATE ###
   def Lox.runFile( path )
     run File::read( path )
+
+    # Indicate an error in the exit code.
+    exit(65) if @@hadError
+    exit(70) if @@hadRuntimeError
   end
 
   def Lox.runPrompt
@@ -57,7 +70,9 @@ class Lox
     # Stop if there was a syntax error.
     return if @@hadError
 
-    puts AstPrinter::new.print(expression)
+    # Sorry, AstPrinter! Time to go.
+    # puts AstPrinter::new.print(expression)
+    @@interpreter.interpret( expression )
   end
 
   def Lox.report( line, where, message )

@@ -1,6 +1,8 @@
 require "./expr"
 require "./token"
 
+# TODO: interfaces aren't a thing in ruby, but this is supposed to implement
+# the Visitor thing
 class AstPrinter
   ## PUBLIC ##
   def print( expr )
