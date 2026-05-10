@@ -1,12 +1,21 @@
 require "./lox"
 require "./loxruntimeerror"
+require "./environment"
 
 class Interpreter
   ## PUBLIC ##
-  def interpret( expr )
+
+  attr_accessor :environment
+
+  def initialize
+    @environment = Environment::new
+  end
+
+  def interpret( statements )
     begin
-      value = evaluate expr
-      puts stringify( value )
+      statements.each do |statement|
+        execute statement
+      end
     rescue LoxRuntimeError => error
       Lox::runtimeError( error )
     end
@@ -30,6 +39,10 @@ class Interpreter
       checkNumberOperand( expr.operator, right )
       return -right
     end
+  end
+
+  def visitVariableExpr( expr )
+    return @environment.get( expr.name )
   end
 
   def visitBinaryExpr( expr )
@@ -89,6 +102,57 @@ class Interpreter
   def evaluate( expr )
     return expr.accept self
   end
+
+  def execute( stmt )
+    stmt.accept(self)
+  end
+
+  def executeBlock( statements, environment )
+    previous = self.environment
+    begin
+      self.environment = environment
+      
+      statements.each do |statement| 
+        execute statement
+      end
+    ensure
+      self.environment = previous
+    end
+  end
+
+  def visitBlockStmt( stmt )
+    executeBlock( stmt.statements, Environment::new( @environment ) )
+    return nil
+  end
+
+
+  def visitExpressionStmt( stmt )
+    evaluate stmt.expression
+    return nil
+  end
+
+  def visitPrintStmt( stmt )
+    value = evaluate stmt.expression
+    puts stringify( value )
+    return nil
+  end
+
+  def visitVarStmt( stmt )
+    value = nil
+    unless stmt.initializer.nil?
+      value = evaluate stmt.initializer
+    end
+
+    @environment.define( stmt.name.lexeme, value )
+    return nil
+  end
+
+  def visitAssignExpr( expr )
+    value = evaluate expr.value
+    environment.assign( expr.name, value )
+    return value
+  end
+
 
   def stringify( object )
     return "nil" if object.nil?

@@ -65,14 +65,14 @@ class Lox
     scanner = Scanner::new( source )
     tokens = scanner.scanTokens
     parser = Parser::new( tokens )
-    expression = parser.parse
+    statements = parser.parse
 
     # Stop if there was a syntax error.
     return if @@hadError
 
     # Sorry, AstPrinter! Time to go.
     # puts AstPrinter::new.print(expression)
-    @@interpreter.interpret( expression )
+    @@interpreter.interpret( statements )
   end
 
   def Lox.report( line, where, message )

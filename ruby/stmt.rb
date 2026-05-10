@@ -3,7 +3,7 @@
 # you
 #
 # https://poignant.guide/book/chapter-6.html
-class Expr
+class Stmt
 
   # Get a metaclass for this class
   def self.metaclass; class << self; self; end; end
@@ -54,35 +54,18 @@ class Expr
   # traits :life, :strength, :charisma, :weapon
 end
 
-class Assign < Expr
-  traits :name, :value
+class Block < Stmt
+  traits :statements
 end
 
-class Binary < Expr
-  traits :left, :operator, :right
-  # def initialize ( left, operator, right )
-  #   @left = left
-  #   @operator = operator
-  #   @right = right
-  # end
-
-  # def accept visitor
-  #   return visitor.visitBinaryExpr(self)
-  # end
-end
-
-class Literal < Expr
-  traits :value
-end
-
-class Grouping < Expr
+class Expression < Stmt
   traits :expression
 end
 
-class Unary < Expr
-  traits :operator, :right
+class Print < Stmt
+  traits :expression
 end
 
-class Variable < Expr
-  traits :name
+class Var < Stmt
+  traits :name, :initializer
 end

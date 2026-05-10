@@ -1,5 +1,6 @@
 require "./lox"
 require "./expr"
+require "./stmt"
 
 class Parser
 
@@ -13,16 +14,86 @@ class Parser
   end
 
   def parse
-    begin
-      return expression
-    rescue ParseError => error
-      return nil
+    statements = []
+
+    until isAtEnd
+      statements << declaration()
     end
+
+    return statements
   end
 
   ## PRIVATE ##
   def expression
-    return equality
+    return assignment
+  end
+
+  def declaration
+    begin
+      return varDeclaration if match :var
+      return statement
+    rescue ParseError
+      synchronize
+      return nil
+    end
+  end
+
+  def statement
+    return printStatement if match :print
+    return Block::new([ block ]) if match :left_brace
+    return expressionStatement
+  end
+
+  def printStatement
+    value = expression
+    consume( :semicolon, "Expect ';' after value." )
+    return Print::new([ value ])
+  end
+
+  def expressionStatement
+    expr = expression
+    consume( :semicolon, "Expect ';' after expression." )
+    return Expression::new([ expr ])
+  end
+
+  def block
+    statements = []
+
+    until check( :right_brace ) or isAtEnd
+      statements << declaration
+    end
+    
+    consume( :right_brace, "Expect '}' after block." )
+    return statements
+  end
+
+  def assignment
+    expr = equality
+    
+    if match :equal
+      equals = previous
+      value = assignment
+
+      if expr.is_a? Variable
+        return Assign::new([ expr.name, value ])
+      end
+
+      error( equals, "Invalid assignment target." )
+    end
+
+    return expr
+  end
+
+  def varDeclaration
+    name = consume( :identifier, "Expect variable name." )
+
+    initializer = nil
+    if match :equal
+      initializer = expression
+    end
+
+    consume( :semicolon, "Expect ';' after variable declaration." )
+    return Var::new([ name, initializer ])
   end
 
   def equality
@@ -90,6 +161,10 @@ class Parser
 
     if match( :number, :string )
       return Literal::new([ previous().literal ])
+    end
+
+    if match( :identifier )
+      return Variable::new([ previous ])
     end
 
     if match( :left_paren )
