@@ -39,9 +39,69 @@ class Parser
   end
 
   def statement
+    return forStatement if match :for
+    return ifStatement if match :if
     return printStatement if match :print
+    return whileStatement if match :while
     return Block::new([ block ]) if match :left_brace
     return expressionStatement
+  end
+
+  def forStatement
+    consume(:left_paren, "Expect '(' after 'for'.")
+
+    initializer = nil
+    if match :semicolon
+      initializer = nil # TODO: clean up
+    elsif match :var
+      initializer = varDeclaration
+    else
+      initializer = expressionStatement
+    end
+
+    condition = nil
+    unless check :semicolon
+      condition = expression
+    end
+    consume( :semicolon, "Expect ';' after loop condition." )
+
+    increment = nil
+    unless check :right_paren
+      increment = expression
+    end
+    consume( :right_paren, "Expect ')' after for clauses." )
+
+    body = statement
+
+    if increment
+      body = Block::new([ [body, Expression::new([ increment ])] ]) # Damn.
+    end
+
+    if condition.nil?
+      condition = Literal::new([ true ])
+    end
+
+    if initializer
+      body = Block::new([ [initializer, body] ])
+    end
+
+    body = While::new([ condition, body ])
+
+    return body
+  end
+
+  def ifStatement
+    consume(:left_paren, "Expect '(' after 'if'.")
+    condition = expression
+    consume(:right_paren, "Expect ')' after if condition.")
+
+    thenBranch = statement
+    elseBranch = nil
+    if match :else
+      elseBranch = statement
+    end
+
+    return If::new([ condition, thenBranch, elseBranch ])
   end
 
   def printStatement
@@ -68,7 +128,7 @@ class Parser
   end
 
   def assignment
-    expr = equality
+    expr = logor
     
     if match :equal
       equals = previous
@@ -84,6 +144,33 @@ class Parser
     return expr
   end
 
+  # Called "or" in the source code, but that's reserved in Ruby.
+  # So "logor" instead, short for "logical or."
+  def logor
+    expr = logand
+
+    while match :or
+      operator = previous
+      right = logand
+      expr = Logical::new([ expr, operator, right ])
+    end
+
+    return expr
+  end
+
+  # Same story as above.
+  def logand
+    expr = equality
+
+    while match :and
+      operator = previous
+      right = equality
+      expr = Logical::new([ expr, operator, right ])
+    end
+
+    return expr
+  end
+
   def varDeclaration
     name = consume( :identifier, "Expect variable name." )
 
@@ -94,6 +181,15 @@ class Parser
 
     consume( :semicolon, "Expect ';' after variable declaration." )
     return Var::new([ name, initializer ])
+  end
+
+  def whileStatement
+    consume( :left_paren, "Expect '(' after 'while'.")
+    condition = expression
+    consume( :right_paren, "Expect ')' after condition.")
+    body = statement
+
+    return While::new([ condition, body ])
   end
 
   def equality

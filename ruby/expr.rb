@@ -75,6 +75,10 @@ class Literal < Expr
   traits :value
 end
 
+class Logical < Expr
+  traits :left, :operator, :right
+end
+
 class Grouping < Expr
   traits :expression
 end

@@ -25,6 +25,18 @@ class Interpreter
     return expr.value
   end
 
+  def visitLogicalExpr( expr )
+    left = evaluate expr.left
+
+    if expr.operator.type == :or
+      return left if isTruthy left
+    else
+      return left if not isTruthy left
+    end
+
+    return evaluate expr.right
+  end
+
   def visitGroupingExpr( expr )
     evaluate expr.expression
   end
@@ -131,6 +143,16 @@ class Interpreter
     return nil
   end
 
+  def visitIfStmt( stmt )
+    if isTruthy( evaluate stmt.condition )
+      execute stmt.thenBranch
+    elsif stmt.elseBranch
+      execute stmt.elseBranch
+    end
+
+    return nil
+  end
+
   def visitPrintStmt( stmt )
     value = evaluate stmt.expression
     puts stringify( value )
@@ -144,6 +166,13 @@ class Interpreter
     end
 
     @environment.define( stmt.name.lexeme, value )
+    return nil
+  end
+
+  def visitWhileStmt( stmt )
+    while isTruthy( evaluate stmt.condition )
+      execute stmt.body
+    end
     return nil
   end
 

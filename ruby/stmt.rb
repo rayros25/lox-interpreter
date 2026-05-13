@@ -62,10 +62,18 @@ class Expression < Stmt
   traits :expression
 end
 
+class If < Stmt
+  traits :condition, :thenBranch, :elseBranch
+end
+
 class Print < Stmt
   traits :expression
 end
 
 class Var < Stmt
   traits :name, :initializer
+end
+
+class While < Stmt
+  traits :condition, :body
 end
