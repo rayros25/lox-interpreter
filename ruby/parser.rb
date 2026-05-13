@@ -77,15 +77,12 @@ class Parser
       body = Block::new([ [body, Expression::new([ increment ])] ]) # Damn.
     end
 
-    if condition.nil?
-      condition = Literal::new([ true ])
-    end
+    condition = Literal::new([ true ]) if condition.nil?
+    body = While::new([ condition, body ])
 
     if initializer
       body = Block::new([ [initializer, body] ])
     end
-
-    body = While::new([ condition, body ])
 
     return body
   end
