@@ -71,6 +71,10 @@ class Binary < Expr
   # end
 end
 
+class Call < Expr
+  traits :callee, :paren, :arguments
+end
+
 class Literal < Expr
   traits :value
 end

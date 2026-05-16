@@ -244,7 +244,21 @@ class Parser
       return Unary::new([ operator, right ])
     end
 
-    return primary
+    return call
+  end
+
+  def call
+    expr = primary
+
+    loop do
+      if match :left_paren
+        expr = finishCall expr
+      else
+        break
+      end
+    end
+
+    return expr
   end
 
   def primary
