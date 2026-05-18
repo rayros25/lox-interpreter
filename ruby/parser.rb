@@ -30,6 +30,7 @@ class Parser
 
   def declaration
     begin
+      return function( "function" ) if match :fun
       return varDeclaration if match :var
       return statement
     rescue ParseError
@@ -111,6 +112,27 @@ class Parser
     expr = expression
     consume( :semicolon, "Expect ';' after expression." )
     return Expression::new([ expr ])
+  end
+
+  def function( kind )
+    name = consume( :identifier, "Expect #{kind} name." )
+    consume( :left_paren, "Expect '(' after #{kind} name." )
+    parameters = []
+    unless check :right_paren
+      loop do
+        if parameters.length >= 255
+          error( peek, "Can't have more than 255 parameters." )
+        end
+
+        parameters << consume( :identifier, "Expect parameter name." )
+        break unless match :comma
+      end
+    end
+    consume( :right_paren, "Expect ')' after parameters." )
+
+    consume( :left_brace, "Expect '{' before #{kind} body." )
+    body = block
+    return Function::new([ name, parameters, body ])
   end
 
   def block
@@ -280,8 +302,8 @@ class Parser
 
   def primary
     return Literal::new([ false ]) if match( :false )
-    return Literal::new([  true ]) if match(  :true )
-    return Literal::new([   nil ]) if match(   :nil )
+    return Literal::new([ true  ]) if match( :true  )
+    return Literal::new([ nil   ]) if match( :nil   )
 
     if match( :number, :string )
       return Literal::new([ previous().literal ])

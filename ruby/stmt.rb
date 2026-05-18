@@ -62,6 +62,10 @@ class Expression < Stmt
   traits :expression
 end
 
+class Function < Stmt
+  traits :name, :params, :body
+end
+
 class If < Stmt
   traits :condition, :thenBranch, :elseBranch
 end
