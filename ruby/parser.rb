@@ -247,6 +247,23 @@ class Parser
     return call
   end
 
+  def finishCall( callee )
+    arguments = []
+    unless check :right_paren
+      loop do
+        if arguments.length >= 255
+          error( peek, "Can't have more than 255 arguments." )
+        end
+        arguments << expression
+        break unless match :comma
+      end
+    end
+
+    paren = consume( :right_paren, "Expect ')' after arguments." )
+
+    return Call::new([ callee, paren, arguments ])
+  end
+
   def call
     expr = primary
 

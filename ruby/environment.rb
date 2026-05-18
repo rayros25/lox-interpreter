@@ -1,8 +1,6 @@
 require "./loxruntimeerror"
 
 class Environment
-  # @values = {}
-
   def initialize( enclosing = nil )
     @values = {}
     @enclosing = enclosing

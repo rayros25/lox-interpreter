@@ -1,14 +1,29 @@
 require "./lox"
 require "./loxruntimeerror"
 require "./environment"
+require "./loxcallable"
 
 class Interpreter
   ## PUBLIC ##
 
-  attr_accessor :environment
+  attr_accessor :globals
 
   def initialize
-    @environment = Environment::new
+    @globals = Environment::new
+    @environment = @globals
+
+    @globals.define("clock", Class::new do
+      include LoxCallable
+      def arity
+        0
+      end
+      def call( interpreter, arguments )
+        return Time.now.to_i
+      end
+      def to_s
+        "<native fn>"
+      end
+    end)
   end
 
   def interpret( statements )
@@ -98,9 +113,32 @@ class Interpreter
       if left.is_a? String and right.is_a? String
         return left + right
       end
-      
+
       raise LoxRuntimeError::new( expr.operator, "Operands must be two numbers or two strings." )
     end
+  end
+
+  def visitCallExpr( expr )
+    callee = evaluate expr.callee
+
+    arguments = []
+    expr.arguments.each do |argument|
+      arguments << evaluate( argument )
+    end
+
+    # TODO: LoxCallable stuff?
+
+    unless callee.is_a? LoxCallable
+      raise LoxRuntimeError::new( expr.paren, "Can only call functions and classes." )
+    end
+
+    function = callee # TODO: LoxCallable cast?
+
+    if arguments.length != function.arity
+      raise RuntimeError::new( expr. paren, "Expected #{function.arity} arguments but got #{arguments.length}." )
+    end
+
+    return function.call( self, arguments )
   end
 
   ## PRIVATE ##
