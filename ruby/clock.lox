@@ -1,0 +1,3 @@
+var t = clock();
+// print t + " is the result of clock().";
+print t + 3;

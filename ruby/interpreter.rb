@@ -14,18 +14,23 @@ class Interpreter
     @globals = Environment::new
     @environment = @globals
 
-    @globals.define("clock", Class::new do
-      include LoxCallable
+    # Slightly different from Java code
+    clockclass =
+    Class.new do
+      # include LoxCallable
       def arity
-        0
+        return 0
       end
       def call( interpreter, arguments )
-        return Time.now.to_i
+        # TODO: Maybe round this a little
+        return Time.now.to_f
       end
       def to_s
-        "<native fn>"
+        return "<native fn>"
       end
-    end)
+    end
+
+    @globals.define("clock", clockclass.new)
   end
 
   def interpret( statements )
@@ -130,8 +135,6 @@ class Interpreter
 
     # NOTE: This implementation is slightly different from the Java one,
     # because Ruby doesn't have interfaces.
-    # unless callee.respond_to? :is_callable?
-    p callee
     unless callee.respond_to? :call
       raise LoxRuntimeError::new( expr.paren, "Can only call functions and classes." )
     end
