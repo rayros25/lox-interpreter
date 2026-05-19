@@ -74,6 +74,10 @@ class Print < Stmt
   traits :expression
 end
 
+class Return < Stmt
+  traits :keyword, :value
+end
+
 class Var < Stmt
   traits :name, :initializer
 end

@@ -1,3 +1,4 @@
+// Fibonacci with while loop
 var a = 0;
 var temp;
 

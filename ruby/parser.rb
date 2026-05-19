@@ -43,6 +43,7 @@ class Parser
     return forStatement if match :for
     return ifStatement if match :if
     return printStatement if match :print
+    return returnStatement if match :return
     return whileStatement if match :while
     return Block::new([ block ]) if match :left_brace
     return expressionStatement
@@ -106,6 +107,17 @@ class Parser
     value = expression
     consume( :semicolon, "Expect ';' after value." )
     return Print::new([ value ])
+  end
+
+  def returnStatement
+    keyword = previous
+    value = nil
+    unless check :semicolon
+      value = expression
+    end
+
+    consume( :semicolon, "Expect ';' after return value." )
+    return Return::new([ keyword, value ])
   end
 
   def expressionStatement

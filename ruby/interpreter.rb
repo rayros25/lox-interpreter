@@ -1,7 +1,9 @@
 require "./lox"
 require "./loxruntimeerror"
-require "./environment"
 require "./loxcallable"
+require "./loxfunction"
+require "./environment"
+require "./returnobj"
 
 class Interpreter
   ## PUBLIC ##
@@ -126,9 +128,11 @@ class Interpreter
       arguments << evaluate( argument )
     end
 
-    # TODO: LoxCallable stuff?
-
-    unless callee.is_a? LoxCallable
+    # NOTE: This implementation is slightly different from the Java one,
+    # because Ruby doesn't have interfaces.
+    # unless callee.respond_to? :is_callable?
+    p callee
+    unless callee.respond_to? :call
       raise LoxRuntimeError::new( expr.paren, "Can only call functions and classes." )
     end
 
@@ -158,15 +162,15 @@ class Interpreter
   end
 
   def executeBlock( statements, environment )
-    previous = self.environment
+    previous = @environment
     begin
-      self.environment = environment
+      @environment = environment
       
       statements.each do |statement| 
         execute statement
       end
     ensure
-      self.environment = previous
+      @environment = previous
     end
   end
 
@@ -178,6 +182,12 @@ class Interpreter
 
   def visitExpressionStmt( stmt )
     evaluate stmt.expression
+    return nil
+  end
+
+  def visitFunctionStmt( stmt )
+    function = LoxFunction::new( stmt, @environment )
+    @environment.define( stmt.name.lexeme, function )
     return nil
   end
 
@@ -195,6 +205,13 @@ class Interpreter
     value = evaluate stmt.expression
     puts stringify( value )
     return nil
+  end
+
+  def visitReturnStmt( stmt )
+    value = nil
+    value = evaluate stmt.value if stmt.value
+
+    raise ReturnObj::new( value )
   end
 
   def visitVarStmt( stmt )
@@ -216,7 +233,7 @@ class Interpreter
 
   def visitAssignExpr( expr )
     value = evaluate expr.value
-    environment.assign( expr.name, value )
+    @environment.assign( expr.name, value )
     return value
   end
 
