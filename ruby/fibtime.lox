@@ -14,5 +14,7 @@ var end = clock();
 
 var delta = end - start;
 
+delta = delta / 1000;
+
 // print "Running this program took " + delta + " seconds.";
 print delta;

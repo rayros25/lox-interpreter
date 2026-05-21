@@ -71,8 +71,11 @@ class Lox
     # Stop if there was a syntax error.
     return if @@hadError
 
-    resolver = Resolver::new( interpreter )
-    resolver.resolve( statements )
+    resolver = Resolver::new( @@interpreter )
+    resolver.resolvelist( statements )
+
+    # Stop if there was a resolution error.
+    return if @@hadError
 
     # Sorry, AstPrinter! Time to go.
     # puts AstPrinter::new.print(expression)

@@ -1,7 +1,10 @@
+require "./lox"
+
 class Resolver
   def initialize( interpreter )
     @interpreter = interpreter
     @scopes = [] # Treat this like a stack.
+    @currentFunction = :fnone
   end
 
   def visitBlockStmt( stmt )
@@ -20,7 +23,7 @@ class Resolver
     declare stmt.name
     define stmt.name
 
-    resolveFunction stmt
+    resolveFunction( stmt, :ffunc )
     return nil
   end
 
@@ -39,6 +42,9 @@ class Resolver
   end
 
   def visitReturnStmt( stmt )
+    if @currentFunction == :fnone
+      Lox::error( stmt.keyword, "Can't return from top-level code." )
+    end
     if stmt.value
       resolve stmt.value
     end
@@ -66,7 +72,7 @@ class Resolver
     return nil
   end
 
-  def viistBinaryExpr( expr )
+  def visitBinaryExpr( expr )
     resolve expr.left
     resolve expr.right
     return nil
@@ -100,7 +106,7 @@ class Resolver
   def visitUnaryExpr( expr )
     resolve expr.right
     return nil
-  endd
+  end
 
   def visitVariableExpr( expr )
     if !@scopes.empty? && @scopes.last[expr.name.lexeme] == false # TODO: is this right?
@@ -114,22 +120,28 @@ class Resolver
   # NOTE: Again,  Ruby doesn't have overloading, so I have to rename this.
   def resolvelist( statements )
     statements.each do |statement|
-      resolve stateemnt
+      resolve statement
     end
   end
 
+  # NOTE: This is also resolves expressions
   def resolve( stmt )
     stmt.accept( self )
   end
 
-  def resolveFunction( function )
+  def resolveFunction( function, type )
+    enclosingFunction = @currentFunction
+    @currentFunction = type
+
     beginScope
-    funcion.params.each do |param|
+    function.params.each do |param|
       declare param
       define param
     end
-    resolve function.body
+    resolvelist function.body
     endScope
+
+    @currentFunction = enclosingFunction
   end
 
   def beginScope
@@ -144,6 +156,9 @@ class Resolver
     return if @scopes.empty?
 
     scope = @scopes.last # Ironically, this is the *top* of the stack.
+    if scope.has_key? name.lexeme
+      Lox::error( name, "Already a variable with this name in this scope." )
+    end
     scope[name.lexeme] = false
   end
 
@@ -154,7 +169,7 @@ class Resolver
 
   def resolveLocal( expr, name )
     (0..@scopes.length - 1).reverse_each do |i|
-      if @scopes[i].containsKey( name.lexeme )
+      if @scopes[i].has_key? name.lexeme
         @interpreter.resolve( expr, @scopes.length - 1 - i)
         return
       end

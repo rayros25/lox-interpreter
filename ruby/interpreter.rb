@@ -85,7 +85,7 @@ class Interpreter
     if distance
       return @environment.getAt( distance, name.lexeme )
     else
-      return @globals[name]
+      return @globals.get( name )
     end
   end
 
