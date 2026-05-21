@@ -13,6 +13,7 @@ class Interpreter
   def initialize
     @globals = Environment::new
     @environment = @globals
+    @locals = Hash::new
 
     # Slightly different from Java code
     clockclass =
@@ -76,7 +77,16 @@ class Interpreter
   end
 
   def visitVariableExpr( expr )
-    return @environment.get( expr.name )
+    return lookUpVariable( expr.name, expr )
+  end
+
+  def lookUpVariable( name, expr )
+    distance = @locals[expr]
+    if distance
+      return @environment.getAt( distance, name.lexeme )
+    else
+      return @globals[name]
+    end
   end
 
   def visitBinaryExpr( expr )
@@ -164,6 +174,10 @@ class Interpreter
     stmt.accept(self)
   end
 
+  def resolve( expr, depth )
+    @locals[expr] = depth
+  end
+
   def executeBlock( statements, environment )
     previous = @environment
     begin
@@ -236,7 +250,14 @@ class Interpreter
 
   def visitAssignExpr( expr )
     value = evaluate expr.value
-    @environment.assign( expr.name, value )
+
+    distance = @locals[expr]
+    if distance
+      @environment.assignAt( distance, expr.name, value )
+    else
+      @globals.assign( expr.name, value )
+    end
+
     return value
   end
 

@@ -3,6 +3,7 @@ require "./parser"
 require "./astprinter"
 require "./loxruntimeerror"
 require "./interpreter"
+require "./resolver"
 
 class Lox
   @@interpreter = Interpreter::new
@@ -69,6 +70,9 @@ class Lox
 
     # Stop if there was a syntax error.
     return if @@hadError
+
+    resolver = Resolver::new( interpreter )
+    resolver.resolve( statements )
 
     # Sorry, AstPrinter! Time to go.
     # puts AstPrinter::new.print(expression)

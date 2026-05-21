@@ -33,4 +33,21 @@ class Environment
   def define( name, value )
     @values[name] = value
   end
+
+  def ancestor( distance )
+    environment = self
+    distance.times do
+      environment = environment.enclosing
+    end
+
+    return environment
+  end
+
+  def getAt( distance, name )
+    return ancestor( distance ).values[name]
+  end
+
+  def assignAt( distance, name, value )
+    ancestor( distance ).values[name.lexeme] = value
+  end
 end
