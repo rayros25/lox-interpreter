@@ -73,6 +73,10 @@ class Interpreter
     return value
   end
 
+  def visitThisExpr( expr )
+    return lookUpVariable( expr.keyword, expr )
+  end
+
   def visitGroupingExpr( expr )
     evaluate expr.expression
   end
@@ -173,6 +177,7 @@ class Interpreter
 
   def visitGetExpr( expr )
     object = evaluate expr.object
+
     if object.is_a? LoxInstance
       return object.get(expr.name)
     end
@@ -223,7 +228,7 @@ class Interpreter
 
     methods = Hash.new
     stmt.methods.each do |method|
-      function = LoxFunction::new( method, @environment )
+      function = LoxFunction::new( method, @environment, method.name.lexeme == "init" )
       methods[method.name.lexeme] = function
     end
     klass = LoxClass::new( stmt.name.lexeme, methods )
@@ -239,7 +244,7 @@ class Interpreter
   end
 
   def visitFunctionStmt( stmt )
-    function = LoxFunction::new( stmt, @environment )
+    function = LoxFunction::new( stmt, @environment, false )
     @environment.define( stmt.name.lexeme, function )
     return nil
   end

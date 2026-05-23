@@ -21,11 +21,19 @@ class LoxClass
 
   def call( interpreter, arguments )
     instance = LoxInstance::new( self )
+    initializer = findMethod "init"
+    if initializer
+      initializer.bind( instance ).call( interpreter, arguments )
+    end
     return instance
   end
 
   def arity
-    0
+    initializer = findMethod "init"
+    unless initializer
+      return 0
+    end
+    return initializer.arity
   end
 
   def to_s

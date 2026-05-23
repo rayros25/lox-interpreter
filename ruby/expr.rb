@@ -87,6 +87,10 @@ class MySet < Expr
   traits :object, :name, :value
 end
 
+class This < Expr
+  traits :keyword
+end
+
 class Unary < Expr
   traits :operator, :right
 end
