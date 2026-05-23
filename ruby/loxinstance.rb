@@ -1,4 +1,5 @@
 require "./loxruntimeerror"
+require "./environment"
 
 class LoxInstance
   def initialize( klass )
@@ -12,7 +13,7 @@ class LoxInstance
     end
 
     method = @klass.findMethod( name.lexeme )
-    return method if method
+    return method.bind( self ) if method
 
     raise LoxRuntimeError::new(name, "Undefined property '#{name.lexeme}'.")
   end

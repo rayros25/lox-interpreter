@@ -184,7 +184,7 @@ class Parser
         return Assign::new([ expr.name, value ])
       elsif expr.is_a? Get
         get = expr
-        return MySet::new([ get.objects, get.name, value ])
+        return MySet::new([ get.object, get.name, value ])
       end
 
       error( equals, "Invalid assignment target." )
@@ -340,6 +340,10 @@ class Parser
 
     if match( :number, :string )
       return Literal::new([ previous().literal ])
+    end
+
+    if match( :this )
+      return This::new([ previous ])
     end
 
     if match( :identifier )

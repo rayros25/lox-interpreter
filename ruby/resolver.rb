@@ -9,6 +9,11 @@ class Resolver
     # fnone
     # ffunc
     # fmethod
+    # finitializer
+    @currentClass = :cnone
+    # Same deal. The possible values are:
+    # cnone
+    # cclass
   end
 
   def visitBlockStmt( stmt )
@@ -19,14 +24,27 @@ class Resolver
   end
 
   def visitMyClassStmt( stmt )
+    enclosingClass = @currentClass
+    @currentClass = :cclass
+
     declare stmt.name
     define stmt.name
 
+    beginScope
+    @scopes.last["this"] = true
+
     stmt.methods.each do |method|
       declaration = :fmethod
+      if method.name.lexeme == "init"
+        declaration = :finitializer
+      end
+
       resolveFunction( method, declaration )
     end
 
+    endScope
+
+    @currentClass = enclosingClass
     return nil
   end
 
@@ -62,6 +80,10 @@ class Resolver
       Lox::error( stmt.keyword, "Can't return from top-level code." )
     end
     if stmt.value
+      if @currentFunction == :finitializer
+        Lox::error( stmt.keyword, "Can't return a value from an initializer." )
+      end
+
       resolve stmt.value
     end
     return nil
@@ -127,6 +149,16 @@ class Resolver
   def visitMySetExpr( expr )
     resolve expr.value
     resolve expr.object
+    return nil
+  end
+
+  def visitThisExpr( expr )
+    if @currentClass == :cnone
+      Lox::error( expr.keyword, "Can't use 'this' outside of a class." )
+      return nil
+    end
+
+    resolveLocal( expr, expr.keyword )
     return nil
   end
 
