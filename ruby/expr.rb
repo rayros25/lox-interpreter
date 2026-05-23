@@ -44,7 +44,7 @@ class Expr
       # This should work, right?
       define_method( :accept ) do |visitor|
         name = eval("self.class.name + self.class.superclass.name")
-        eval("return visitor.visit" + name + "(self)")
+        eval("return visitor.visit#{name}(self)")
       end
     end
 
@@ -60,19 +60,14 @@ end
 
 class Binary < Expr
   traits :left, :operator, :right
-  # def initialize ( left, operator, right )
-  #   @left = left
-  #   @operator = operator
-  #   @right = right
-  # end
-
-  # def accept visitor
-  #   return visitor.visitBinaryExpr(self)
-  # end
 end
 
 class Call < Expr
   traits :callee, :paren, :arguments
+end
+
+class Get < Expr
+  traits :object, :name
 end
 
 class Literal < Expr
@@ -85,6 +80,11 @@ end
 
 class Grouping < Expr
   traits :expression
+end
+
+# Same story with "Class" and "MyClass"
+class MySet < Expr
+  traits :object, :name, :value
 end
 
 class Unary < Expr

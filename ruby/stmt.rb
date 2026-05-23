@@ -58,6 +58,11 @@ class Block < Stmt
   traits :statements
 end
 
+# NOTE: Named "Class" in the source code.
+class MyClass < Stmt
+  traits :name, :methods
+end
+
 class Expression < Stmt
   traits :expression
 end

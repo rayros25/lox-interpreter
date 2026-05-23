@@ -5,12 +5,28 @@ class Resolver
     @interpreter = interpreter
     @scopes = [] # Treat this like a stack.
     @currentFunction = :fnone
+    # We simply use symbols for FunctionType. The possible values are:
+    # fnone
+    # ffunc
+    # fmethod
   end
 
   def visitBlockStmt( stmt )
     beginScope
     resolvelist( stmt.statements )
     endScope
+    return nil
+  end
+
+  def visitMyClassStmt( stmt )
+    declare stmt.name
+    define stmt.name
+
+    stmt.methods.each do |method|
+      declaration = :fmethod
+      resolveFunction( method, declaration )
+    end
+
     return nil
   end
 
@@ -88,6 +104,11 @@ class Resolver
     return nil
   end
 
+  def visitGetExpr( expr )
+    resolve expr.object
+    return nil
+  end
+
   def visitGroupingExpr( expr )
     resolve expr.expression
     return nil
@@ -100,6 +121,12 @@ class Resolver
   def visitLogicalExpr( expr )
     resolve expr.left
     resolve expr.right
+    return nil
+  end
+
+  def visitMySetExpr( expr )
+    resolve expr.value
+    resolve expr.object
     return nil
   end
 

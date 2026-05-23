@@ -30,6 +30,7 @@ class Parser
 
   def declaration
     begin
+      return classDeclaration if match :class
       return function( "function" ) if match :fun
       return varDeclaration if match :var
       return statement
@@ -37,6 +38,20 @@ class Parser
       synchronize
       return nil
     end
+  end
+
+  def classDeclaration
+    name = consume( :identifier, "Expect class name." )
+    consume( :left_brace, "Expect '{' before class body." )
+
+    methods = []
+    while !check( :right_brace ) && !isAtEnd
+      methods << function("method")
+    end
+
+    consume( :right_brace, "Expect '}' after class body." )
+
+    return MyClass::new([ name, methods ])
   end
 
   def statement
@@ -167,6 +182,9 @@ class Parser
 
       if expr.is_a? Variable
         return Assign::new([ expr.name, value ])
+      elsif expr.is_a? Get
+        get = expr
+        return MySet::new([ get.objects, get.name, value ])
       end
 
       error( equals, "Invalid assignment target." )
@@ -304,6 +322,9 @@ class Parser
     loop do
       if match :left_paren
         expr = finishCall expr
+      elsif match :dot
+        name = consume( :identifier, "Expect property name after '.'." )
+        expr = Get::new([ expr, name ])
       else
         break
       end

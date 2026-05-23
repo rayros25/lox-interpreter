@@ -4,6 +4,7 @@ require "./loxcallable"
 require "./loxfunction"
 require "./environment"
 require "./returnobj"
+require "./loxclass"
 
 class Interpreter
   ## PUBLIC ##
@@ -58,6 +59,18 @@ class Interpreter
     end
 
     return evaluate expr.right
+  end
+
+  def visitMySetExpr( expr )
+    object = evaluate expr.object
+
+    unless object.is_a? LoxInstance
+      raise LoxRuntimeError::new( epxr.name, "Only instances have fields." )
+    end
+
+    value = evaluate expr.value
+    object.set( expr.name, value )
+    return value
   end
 
   def visitGroupingExpr( expr )
@@ -152,10 +165,19 @@ class Interpreter
     function = callee # TODO: LoxCallable cast?
 
     if arguments.length != function.arity
-      raise RuntimeError::new( expr. paren, "Expected #{function.arity} arguments but got #{arguments.length}." )
+      raise LoxRuntimeError::new( expr. paren, "Expected #{function.arity} arguments but got #{arguments.length}." )
     end
 
     return function.call( self, arguments )
+  end
+
+  def visitGetExpr( expr )
+    object = evaluate expr.object
+    if object.is_a? LoxInstance
+      return object.get(expr.name)
+    end
+
+    raise LoxRuntimeError::new( expr.name, "Only instances have properties." )
   end
 
   ## PRIVATE ##
@@ -193,6 +215,20 @@ class Interpreter
 
   def visitBlockStmt( stmt )
     executeBlock( stmt.statements, Environment::new( @environment ) )
+    return nil
+  end
+
+  def visitMyClassStmt( stmt )
+    @environment.define( stmt.name.lexeme, nil )
+
+    methods = Hash.new
+    stmt.methods.each do |method|
+      function = LoxFunction::new( method, @environment )
+      methods[method.name.lexeme] = function
+    end
+    klass = LoxClass::new( stmt.name.lexeme, methods )
+
+    @environment.assign( stmt.name, klass )
     return nil
   end
 
