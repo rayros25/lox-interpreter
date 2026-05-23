@@ -1,4 +1,5 @@
 *.class
 */jlox
 jlox
+generate_ast
 *.o
