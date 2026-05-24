@@ -87,6 +87,10 @@ class MySet < Expr
   traits :object, :name, :value
 end
 
+class Super < Expr
+  traits :keyword, :method
+end
+
 class This < Expr
   traits :keyword
 end

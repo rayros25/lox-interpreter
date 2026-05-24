@@ -6,14 +6,19 @@ class LoxClass
 
   attr_accessor :name
 
-  def initialize( name, methods )
+  def initialize( name, superclass, methods )
     @name = name
+    @superclass = superclass
     @methods = methods
   end
 
   def findMethod( name )
     if @methods.has_key? name
       return @methods[name]
+    end
+
+    if @superclass
+      return @superclass.findMethod( name )
     end
 
     return nil

@@ -14,6 +14,7 @@ class Resolver
     # Same deal. The possible values are:
     # cnone
     # cclass
+    # csubclass
   end
 
   def visitBlockStmt( stmt )
@@ -30,6 +31,20 @@ class Resolver
     declare stmt.name
     define stmt.name
 
+    if stmt.superclass && stmt.name.lexeme == stmt.superclass.name.lexeme
+      Lox::error( stmt.superclass.name, "A class can't inherit from itself." )
+    end
+
+    if stmt.superclass
+      @currentClass = :csubclass
+      resolve stmt.superclass
+    end
+
+    if stmt.superclass
+      beginScope
+      @scopes.last["super"] = true
+    end
+
     beginScope
     @scopes.last["this"] = true
 
@@ -43,6 +58,8 @@ class Resolver
     end
 
     endScope
+
+    endScope if stmt.superclass
 
     @currentClass = enclosingClass
     return nil
@@ -149,6 +166,17 @@ class Resolver
   def visitMySetExpr( expr )
     resolve expr.value
     resolve expr.object
+    return nil
+  end
+
+  def visitSuperExpr( expr )
+    if @currentClass == :cnone
+      Lox::error( expr.keyword, "Can't use 'super' outside of a class." )
+    elsif @currentClass != :csubclass
+      Lox::error( expr.keyword, "Can't use 'super' in a class with no superclass." )
+    end
+
+    resolveLocal( expr, expr.keyword )
     return nil
   end
 

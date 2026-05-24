@@ -60,7 +60,7 @@ end
 
 # NOTE: Named "Class" in the source code.
 class MyClass < Stmt
-  traits :name, :methods
+  traits :name, :superclass, :methods
 end
 
 class Expression < Stmt
