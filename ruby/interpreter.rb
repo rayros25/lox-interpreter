@@ -6,6 +6,8 @@ require "./environment"
 require "./returnobj"
 require "./loxclass"
 
+require "./corefuncs"
+
 class Interpreter
   ## PUBLIC ##
 
@@ -33,6 +35,9 @@ class Interpreter
     end
 
     @globals.define("clock", clockclass.new)
+
+    loadcorefuncs()
+
   end
 
   def interpret( statements )
@@ -138,13 +143,10 @@ class Interpreter
     when :less_equal
       checkNumberOperands( expr.operator, left, right )
       return left <= right
-
-    # This is fine, right?
     when :equal_equal
       return left == right
     when :bang_equal
       return left != right
-
     when :minus
       checkNumberOperands( expr.operator, left, right )
       return left - right
@@ -181,7 +183,7 @@ class Interpreter
       raise LoxRuntimeError::new( expr.paren, "Can only call functions and classes." )
     end
 
-    function = callee # TODO: LoxCallable cast?
+    function = callee
 
     if arguments.length != function.arity
       raise LoxRuntimeError::new( expr. paren, "Expected #{function.arity} arguments but got #{arguments.length}." )
@@ -204,7 +206,7 @@ class Interpreter
   def isTruthy( object )
     return false if object.nil?
     return object if object.is_a? TrueClass or
-                     object.is_a? FalseClass # This is so dumb.
+      object.is_a? FalseClass # Thank you Ruby, very cool.
     return true
   end
 

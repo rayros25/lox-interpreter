@@ -74,9 +74,9 @@ class Parser
   def forStatement
     consume(:left_paren, "Expect '(' after 'for'.")
 
-    initializer = nil
+    initializer = "Ruby doesn't have declarations, so this will have to do."
     if match :semicolon
-      initializer = nil # TODO: clean up
+      initializer = nil
     elsif match :var
       initializer = varDeclaration
     else
@@ -341,9 +341,9 @@ class Parser
   end
 
   def primary
-    return Literal::new([ false ]) if match( :false )
-    return Literal::new([ true  ]) if match( :true  )
-    return Literal::new([ nil   ]) if match( :nil   )
+    return Literal::new([ false ]) if match :false 
+    return Literal::new([ true  ]) if match :true  
+    return Literal::new([ nil   ]) if match :nil   
 
     if match( :number, :string )
       return Literal::new([ previous().literal ])

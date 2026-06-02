@@ -1,7 +1,7 @@
 require "./expr"
 require "./token"
 
-# TODO: interfaces aren't a thing in ruby, but this is supposed to implement
+# TODO: interfaces aren't a thing in Ruby, but this is supposed to implement
 # the Visitor thing
 class AstPrinter
   ## PUBLIC ##
@@ -36,21 +36,6 @@ class AstPrinter
     }
 
     builder << ")"
-    # return builder
+    return builder
   end
 end
-
-
-# expression = Binary::new( :a, :b, :c )
-# expression = Binary::new( [:a, :b, :c] ) # Is this baD?
-# expression = Binary::new([  Literal::new([6]), Token::new( :minus, "-", nil, 1 ), Literal::new([7]) ])
-
-## TESTING
-# expression = Binary::new([
-#   Unary::new([ Token::new( :minus, "-", nil, 1 ),
-#               Literal::new([ 123 ]) ]),
-#   Token::new( :star, "*", nil, 1 ),
-#   Grouping::new([ Literal::new([ 45.67 ]) ])
-# ])
-#
-# puts AstPrinter::new.print(expression)

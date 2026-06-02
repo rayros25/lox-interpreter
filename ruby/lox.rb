@@ -9,8 +9,6 @@ class Lox
   @@interpreter = Interpreter::new
   @@hadError = false
   @@hadRuntimeError = false
-  # def initialize
-  # end
 
   ### PUBLIC ###
   def Lox.main( args )
@@ -18,19 +16,21 @@ class Lox
       puts "Usage: rlox [script]"
       exit(64)
     elsif args.length == 1
-      Lox::runFile( args[0] )
+      Lox::run_file( args[0] )
     else
-      Lox::runPrompt
+      Lox::run_prompt
     end
   end
 
-  # TODO: overloading??
-  # def Lox.error( line, message )
-  #   report( line, "", message )
-  # end
+  # NOTE: Yet another case of Ruby not having overloading
+  def Lox.error( firstthing, message )
+    if firstthing.is_a? Integer
+      line = firstthing
+      report( line, "", message )
+      return
+    end
 
-  # TODO: Should these be two separate functions?
-  def Lox.error( token, message )
+    token = firstthing
     if token.type == :eof
       report( token.line, " at end", message)
     else
@@ -44,7 +44,7 @@ class Lox
   end
 
   ### PRIVATE ###
-  def Lox.runFile( path )
+  def Lox.run_file( path )
     run File::read( path )
 
     # Indicate an error in the exit code.
@@ -52,13 +52,13 @@ class Lox
     exit(70) if @@hadRuntimeError
   end
 
-  def Lox.runPrompt
+  def Lox.run_prompt
     loop do
       print "> "
       line = gets
       break unless line
       line.chomp! # Get rid of the \n at the end
-      run( line )
+      run line 
     end
   end
 

@@ -109,7 +109,7 @@ class Scanner
   end
 
   def addToken( *args )
-    # We have to do this cuz ruby doesn't have overloading
+    # We have to do this cuz Ruby doesn't have overloading
     case args.size
     when 1
       # def addToken( type )

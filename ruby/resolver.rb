@@ -196,7 +196,7 @@ class Resolver
   end
 
   def visitVariableExpr( expr )
-    if !@scopes.empty? && @scopes.last[expr.name.lexeme] == false # TODO: is this right?
+    if !@scopes.empty? && @scopes.last[expr.name.lexeme] == false
       Lox::error( expr.name "Can't read local variable in its own initializer." )
     end
 
